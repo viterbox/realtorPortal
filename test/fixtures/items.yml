@@ -1,0 +1,47 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  propertyType: MyString
+  itemId: MyString
+  url: MyString
+  title: MyString
+  content: MyText
+  type: 
+  agency: MyString
+  currency: MyString
+  price: 1.5
+  unit: MyString
+  floorArea: 1
+  rooms: 1
+  bathrooms: 1
+  city: MyString
+  cityArea: MyString
+  region: MyString
+  longitude: 1.5
+  latitude: 1.5
+  mainPicture: MyString
+  date: MyString
+  time: MyString
+
+two:
+  propertyType: MyString
+  itemId: MyString
+  url: MyString
+  title: MyString
+  content: MyText
+  type: 
+  agency: MyString
+  currency: MyString
+  price: 1.5
+  unit: MyString
+  floorArea: 1
+  rooms: 1
+  bathrooms: 1
+  city: MyString
+  cityArea: MyString
+  region: MyString
+  longitude: 1.5
+  latitude: 1.5
+  mainPicture: MyString
+  date: MyString
+  time: MyString
