@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get 'updater/index'
+
   resources :items do
     collection do
       get 'list'
