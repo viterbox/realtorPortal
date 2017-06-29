@@ -1,0 +1,7 @@
+<h1>List</h1>
+<p>Find me in app/views/items/list.html.erb</p>
+<%= paginate @items %>
+
+<%  @items.each do |item| %>
+    <div><%= item.propertyType %></div>
+<% end %>

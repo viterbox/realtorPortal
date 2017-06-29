@@ -7,6 +7,18 @@ class ItemsController < ApplicationController
     @items = Item.all
   end
 
+   def list
+
+    vPage = 0
+
+    if params[:page]
+      vPage= :page
+    end
+
+    @items = Kaminari.paginate_array(Item.all).page(params[vPage])
+
+  end
+
   # GET /items/1
   # GET /items/1.json
   def show
