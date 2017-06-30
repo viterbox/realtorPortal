@@ -10,6 +10,7 @@ class Item
   field :agency, type: String
   field :currency, type: String
   field :price, type: Float
+  field :period, type: String
   field :date, type: String
   field :time, type: String
 end
