@@ -36,6 +36,16 @@ class UpdaterController < ApplicationController
         date:node.at_css("date").nil? ? "" : node.at_css("date").text,
         time:node.at_css("time").nil? ? "" : node.at_css("time").text
       )
+
+      # Location management
+      itemCreated.create_location(
+        city:node.at_css("city").nil? ? "" : node.at_css("city").text,
+        city_area:node.at_css("city_area").nil? ? "" : node.at_css("city_area").text,
+        region:node.at_css("region").nil? ? "" : node.at_css("region").text,
+        postalcode:node.at_css("postalcode").nil? ? "" : node.at_css("postalcode").text,
+        longitude:node.at_css("longitude").nil? ? "" : node.at_css("longitude").text,
+        latitude:node.at_css("latitude").nil? ? "" : node.at_css("latitude").text
+      )
       
       # Picture management
       pictures = node.at_css("pictures").nil? ? [] : node.at_css("pictures").xpath("picture").map
@@ -45,7 +55,6 @@ class UpdaterController < ApplicationController
       }
 
       itemCreated.picture.create(picturesList)
-
     }
     
     @result = "Data updated"
