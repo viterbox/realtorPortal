@@ -46,6 +46,39 @@ class UpdaterController < ApplicationController
         longitude:node.at_css("longitude").nil? ? "" : node.at_css("longitude").text,
         latitude:node.at_css("latitude").nil? ? "" : node.at_css("latitude").text
       )
+
+      # Attributes management
+      attributeList = []
+      if (!node.at_css("rooms").nil?)
+        attributeList << {type:"integer",name:"rooms",value:node.at_css("rooms").text,decorated:""}
+      end
+
+      if (!node.at_css("bathrooms").nil?)
+        attributeList << {type:"integer",name:"bathrooms",value:node.at_css("bathrooms").text,decorated:""}
+      end
+
+      if (!node.at_css("parking").nil?)
+        attributeList << {type:"integer",name:"parking",value:node.at_css("parking").text,decorated:""}
+      end
+
+      if (!node.at_css("year").nil?)
+        attributeList << {type:"integer",name:"year",value:node.at_css("year").text,decorated:""}
+      end
+
+      if (!node.at_css("is_new").nil?)
+        attributeList << {type:"boolean",name:"is_new",value:node.at_css("is_new").text,decorated:""}
+      end
+
+      if (!node.at_css("floor_area").nil?)
+        attributeList << {type:"number_unit",name:"floor_area",value:node.at_css("floor_area").text,decorated:node.at_css("floor_area").attr("unit")}
+      end
+
+      if (!node.at_css("plot_area").nil?)
+        attributeList << {type:"number_unit",name:"plot_area",value:node.at_css("plot_area").text,decorated:node.at_css("plot_area").attr("unit")}
+      end
+
+      itemCreated.attribute.create(attributeList)
+
       
       # Picture management
       pictures = node.at_css("pictures").nil? ? [] : node.at_css("pictures").xpath("picture").map
