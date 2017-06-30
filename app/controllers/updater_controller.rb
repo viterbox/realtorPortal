@@ -14,25 +14,15 @@ class UpdaterController < ApplicationController
       end
     end
 
+    # Open file XML with Nokogiri gem
     doc = File.open("/tmp/trovit_MX.xml") { |f| Nokogiri::XML(f) }
 
-    p "va a leer los ads"
-
-    #@values = doc.xpath('//text()').map{ |node| node.text }
-
     adNodes = doc.xpath("//ad").map
-
-    p adNodes.count
-
-    #at_css("dramas name") 
 
     Item.destroy_all
 
     adNodes.each { |node| 
-      #puts node.at_css("id").text
-      #xml.xpath("//Placement").attr("messageId")
-      # rooms:node.at_css("rooms").nil? ? 0 : node.at_css("rooms").text,
-      Item.create(
+      itemCreated = Item.create(
         item_id:node.at_css("id").nil? ? "" : node.at_css("id").text, 
         property_type:node.at_css("property_type").nil? ? "" : node.at_css("property_type").text,
         url:node.at_css("url").nil? ? "" : node.at_css("url").text,
@@ -42,10 +32,8 @@ class UpdaterController < ApplicationController
         agency:node.at_css("agency").nil? ? "" : node.at_css("agency").text,
         currency:node.at_css("price").nil? ? "" : node.at_css("price").attr("currency"),
         price:node.at_css("price").nil? ? "" : node.at_css("price").text
-      ) 
+      )
     }
-
-    p "ads leidos"
     
     @result = "Data updated"
   end
