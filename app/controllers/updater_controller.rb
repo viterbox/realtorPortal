@@ -13,6 +13,38 @@ class UpdaterController < ApplicationController
         IO.copy_stream(input_stream, output_stream)
       end
     end
+
+    doc = File.open("/tmp/trovit_MX.xml") { |f| Nokogiri::XML(f) }
+
+    p "va a leer los ads"
+
+    #@values = doc.xpath('//text()').map{ |node| node.text }
+
+    adNodes = doc.xpath("//ad").map
+
+    p adNodes.count
+
+    #at_css("dramas name") 
+
+    Item.destroy_all
+
+    adNodes.each { |node| 
+      #puts node.at_css("id").text
+      #xml.xpath("//Placement").attr("messageId")
+      Item.create(
+        item_id:node.at_css("id").text, 
+        property_type:node.at_css("property_type").text,
+        url:node.at_css("url").text,
+        title:node.at_css("title").text,
+        content:node.at_css("content").text,
+        type:node.at_css("type").text,
+        agency:node.at_css("agency").text,
+        currency:node.at_css("price").attr("currency"),
+        price:node.at_css("price").text
+      ) 
+    }
+
+    p "ads leidos"
     
     @result = "Data updated"
   end
