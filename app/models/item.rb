@@ -1,5 +1,6 @@
 class Item
   include Mongoid::Document
+  embeds_many :picture
   field :property_type, type: String
   field :item_id, type: String
   field :url, type: String
