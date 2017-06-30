@@ -31,16 +31,17 @@ class UpdaterController < ApplicationController
     adNodes.each { |node| 
       #puts node.at_css("id").text
       #xml.xpath("//Placement").attr("messageId")
+      # rooms:node.at_css("rooms").nil? ? 0 : node.at_css("rooms").text,
       Item.create(
-        item_id:node.at_css("id").text, 
-        property_type:node.at_css("property_type").text,
-        url:node.at_css("url").text,
-        title:node.at_css("title").text,
-        content:node.at_css("content").text,
-        type:node.at_css("type").text,
-        agency:node.at_css("agency").text,
-        currency:node.at_css("price").attr("currency"),
-        price:node.at_css("price").text
+        item_id:node.at_css("id").nil? ? "" : node.at_css("id").text, 
+        property_type:node.at_css("property_type").nil? ? "" : node.at_css("property_type").text,
+        url:node.at_css("url").nil? ? "" : node.at_css("url").text,
+        title:node.at_css("title").nil? ? "" : node.at_css("title").text,
+        content:node.at_css("content").nil? ? "" : node.at_css("content").text,
+        type:node.at_css("type").nil? ? "" : node.at_css("type").text,
+        agency:node.at_css("agency").nil? ? "" : node.at_css("agency").text,
+        currency:node.at_css("price").nil? ? "" : node.at_css("price").attr("currency"),
+        price:node.at_css("price").nil? ? "" : node.at_css("price").text
       ) 
     }
 
