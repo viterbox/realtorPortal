@@ -33,6 +33,16 @@ class UpdaterController < ApplicationController
         currency:node.at_css("price").nil? ? "" : node.at_css("price").attr("currency"),
         price:node.at_css("price").nil? ? "" : node.at_css("price").text
       )
+      
+      # Picture management
+      pictures = node.at_css("pictures").nil? ? [] : node.at_css("pictures").xpath("picture").map
+      picturesList = []
+      pictures.each{ |picture|
+        picturesList << {picture_url:picture.at_css("picture_url").text}
+      }
+
+      itemCreated.picture.create(picturesList)
+
     }
     
     @result = "Data updated"
