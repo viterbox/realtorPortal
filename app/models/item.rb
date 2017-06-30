@@ -2,6 +2,7 @@ class Item
   include Mongoid::Document
   embeds_many :picture
   embeds_one :location
+  embeds_many :attribute
   field :property_type, type: String
   field :item_id, type: String
   field :url, type: String
