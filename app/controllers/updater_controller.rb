@@ -31,7 +31,8 @@ class UpdaterController < ApplicationController
         type:node.at_css("type").nil? ? "" : node.at_css("type").text,
         agency:node.at_css("agency").nil? ? "" : node.at_css("agency").text,
         currency:node.at_css("price").nil? ? "" : node.at_css("price").attr("currency"),
-        price:node.at_css("price").nil? ? "" : node.at_css("price").text
+        price:node.at_css("price").nil? ? "" : node.at_css("price").text,
+        period:node.at_css("price").nil? ? "" : node.at_css("price").attr("period")
       )
       
       # Picture management
