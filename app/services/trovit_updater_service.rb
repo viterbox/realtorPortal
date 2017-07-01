@@ -66,8 +66,8 @@ class TrovitUpdaterService < UpdaterService
         )
     end
 
-    def build_item_attributes(item, trovitProperty)
-        attributeList = []
+    def get_attributes_list(trovitProperty)
+         attributeList = []
 
         if (get_property_field(trovitProperty, "rooms") != "")
             attributeList << {type:"integer", name:"rooms", value:get_property_field(trovitProperty, "rooms"), decorated:""}
@@ -97,7 +97,12 @@ class TrovitUpdaterService < UpdaterService
             attributeList << {type:"number_unit", name:"plot_area", value:get_property_field(trovitProperty, "plot_area"), decorated:get_property_field_attribute(trovitProperty, "plot_area", "unit")}
         end
 
-        item.attribute.create(attributeList)     
+        attributeList
+    end
+
+    def build_item_attributes(item, trovitProperty)
+       attributeList = get_attributes_list(trovitProperty)
+       item.attribute.create(attributeList)     
     end
 
     def build_item_pictures(item, trovitProperty)
@@ -111,6 +116,7 @@ class TrovitUpdaterService < UpdaterService
     end
 
     def update_item(currentItem, trovitProperty)
+
          currentItem.update(
             item_id:get_property_field(trovitProperty, "id"), 
             property_type:get_property_field(trovitProperty, "property_type"),
@@ -130,6 +136,7 @@ class TrovitUpdaterService < UpdaterService
     end
 
     def update_item_location(currentItem, trovitProperty)
+
         currentItem.update( 
             'location.city':get_property_field(trovitProperty, "city"),
             'location.city_area':get_property_field(trovitProperty, "city_area"),
@@ -139,6 +146,11 @@ class TrovitUpdaterService < UpdaterService
             'location.latitude':get_property_field(trovitProperty, "latitude")    
         )
         
+    end
+
+    def update_item_attributes(currentItem, trovitProperty)
+        attributeList = get_attributes_list(trovitProperty)
+        currentItem.update(attribute:attributeList)      
     end
 
     def update_data
@@ -163,6 +175,7 @@ class TrovitUpdaterService < UpdaterService
             else
                 update_item(item,trovitProperty)
                 update_item_location(item, trovitProperty)
+                update_item_attributes(item, trovitProperty)
             end
         }
     end
