@@ -33,6 +33,10 @@ class TrovitUpdaterService < UpdaterService
         trovitProperty.at_css(fildName).nil? ? "" : trovitProperty.at_css(fildName).text
     end
 
+    def get_property_field_attribute(trovitProperty, fildName, attributeName)
+        trovitProperty.at_css(fildName).nil? ? "" : (trovitProperty.at_css(fildName).attr(attributeName).nil? ? "" : trovitProperty.at_css(fildName).attr(attributeName))
+    end
+
     def build_item(trovitProperty)
         newItem = Item.create(
             item_id:get_property_field(trovitProperty, "id"), 
@@ -42,9 +46,9 @@ class TrovitUpdaterService < UpdaterService
             content:get_property_field(trovitProperty, "content"),
             type:get_property_field(trovitProperty, "type"),
             agency:get_property_field(trovitProperty, "agency"),
-            currency:trovitProperty.at_css("price").nil? ? "" : trovitProperty.at_css("price").attr("currency"),
+            currency:get_property_field_attribute(trovitProperty, "price", "currency"),
             price:get_property_field(trovitProperty, "price"),
-            period:trovitProperty.at_css("price").nil? ? "" : trovitProperty.at_css("price").attr("period"),
+            period:get_property_field_attribute(trovitProperty, "price", "period"),
             date:get_property_field(trovitProperty, "date"),
             time:get_property_field(trovitProperty, "time"),
         )
