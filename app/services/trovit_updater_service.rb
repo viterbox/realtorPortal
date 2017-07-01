@@ -29,24 +29,24 @@ class TrovitUpdaterService < UpdaterService
         trovitXmlFile.xpath("//ad").map
     end
 
-    def get_property_fied(trovitProperty, fildName)
+    def get_property_field(trovitProperty, fildName)
         trovitProperty.at_css(fildName).nil? ? "" : trovitProperty.at_css(fildName).text
     end
 
     def build_item(trovitProperty)
         newItem = Item.create(
-            item_id:get_property_fied(trovitProperty, "id"), 
-            property_type:get_property_fied(trovitProperty, "property_type"),
-            url:get_property_fied(trovitProperty, "url"),
-            title:get_property_fied(trovitProperty, "title"),
-            content:get_property_fied(trovitProperty, "content"),
-            type:get_property_fied(trovitProperty, "type"),
-            agency:get_property_fied(trovitProperty, "agency"),
+            item_id:get_property_field(trovitProperty, "id"), 
+            property_type:get_property_field(trovitProperty, "property_type"),
+            url:get_property_field(trovitProperty, "url"),
+            title:get_property_field(trovitProperty, "title"),
+            content:get_property_field(trovitProperty, "content"),
+            type:get_property_field(trovitProperty, "type"),
+            agency:get_property_field(trovitProperty, "agency"),
             currency:trovitProperty.at_css("price").nil? ? "" : trovitProperty.at_css("price").attr("currency"),
-            price:get_property_fied(trovitProperty, "price"),
+            price:get_property_field(trovitProperty, "price"),
             period:trovitProperty.at_css("price").nil? ? "" : trovitProperty.at_css("price").attr("period"),
-            date:get_property_fied(trovitProperty, "date"),
-            time:get_property_fied(trovitProperty, "time"),
+            date:get_property_field(trovitProperty, "date"),
+            time:get_property_field(trovitProperty, "time"),
         )
     end
 
