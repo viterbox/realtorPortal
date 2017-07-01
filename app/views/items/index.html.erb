@@ -33,8 +33,8 @@
   <tbody>
     <% @items.each do |item| %>
       <tr>
-        <td><%= item.propertyType %></td>
-        <td><%= item.itemId %></td>
+        <td><%= item.property_type %></td>
+        <td><%= item.item_id %></td>
         <td><%= item.url %></td>
         <td><%= item.title %></td>
         <td><%= item.content %></td>
@@ -42,16 +42,6 @@
         <td><%= item.agency %></td>
         <td><%= item.currency %></td>
         <td><%= item.price %></td>
-        <td><%= item.unit %></td>
-        <td><%= item.floorArea %></td>
-        <td><%= item.rooms %></td>
-        <td><%= item.bathrooms %></td>
-        <td><%= item.city %></td>
-        <td><%= item.cityArea %></td>
-        <td><%= item.region %></td>
-        <td><%= item.longitude %></td>
-        <td><%= item.latitude %></td>
-        <td><%= item.mainPicture %></td>
         <td><%= item.date %></td>
         <td><%= item.time %></td>
         <td><%= link_to 'Show', item %></td>
