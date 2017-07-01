@@ -163,6 +163,21 @@ class TrovitUpdaterService < UpdaterService
         currentItem.update(picture:picturesList)     
     end
 
+    def turn_off_items(trovitXmlFile)
+        itemIdsFromXml = trovitXmlFile.xpath("//id").map
+         
+        itemIdsXmlList = []
+        itemIdsFromXml.each{ |itemIdXml|
+             itemIdsXmlList << itemIdXml.text   
+        }
+
+        Item.all.each{|item|   
+            if !itemIdsXmlList.include? item.item_id
+                item.update(status:"closed")
+            end
+        }
+    end
+
     def update_data
         
         trovitXmlFile = open_trovit_file
@@ -189,5 +204,7 @@ class TrovitUpdaterService < UpdaterService
                 update_item_pictures(item, trovitProperty)
             end
         }
+
+        turn_off_items(trovitXmlFile)
     end
 end
