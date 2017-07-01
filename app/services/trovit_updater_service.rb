@@ -3,26 +3,33 @@ require 'zlib'
 require 'open-uri'
 
 class TrovitUpdaterService < UpdaterService
-     def get_datasource
-        
-        # Download file xml.gz
+    def get_datasource
+         download_trovit_file
+         uncompress_trovit_file
+    end
+
+    def download_trovit_file
         download = open('http://www.stagingeb.com/feeds/d420256874ddb9b6ee5502b9d54e773d8316a695/trovit_MX.xml.gz')
         IO.copy_stream(download, '/tmp/trovit_MX.xml.gz')
+    end
 
-        # Uncompress file xml.gz
+    def uncompress_trovit_file
         Zlib::GzipReader.open('/tmp/trovit_MX.xml.gz') do | input_stream |
             File.open("/tmp/trovit_MX.xml", "w") do |output_stream|
                 IO.copy_stream(input_stream, output_stream)
             end
         end
+    end
 
+    def open_trovit_file
+        File.open("/tmp/trovit_MX.xml") { |f| Nokogiri::XML(f) }
     end
 
     def update_data
-        # Open file XML with Nokogiri gem
-        doc = File.open("/tmp/trovit_MX.xml") { |f| Nokogiri::XML(f) }
+        
+        trovitXmlFile = open_trovit_file
 
-        adNodes = doc.xpath("//ad").map
+        adNodes = trovitXmlFile.xpath("//ad").map
 
         Item.destroy_all
 
