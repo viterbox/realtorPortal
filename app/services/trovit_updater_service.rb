@@ -25,15 +25,19 @@ class TrovitUpdaterService < UpdaterService
         File.open("/tmp/trovit_MX.xml") { |f| Nokogiri::XML(f) }
     end
 
+    def get_properties_from_trovit(trovitXmlFile)
+        trovitXmlFile.xpath("//ad").map
+    end
+
     def update_data
         
         trovitXmlFile = open_trovit_file
 
-        adNodes = trovitXmlFile.xpath("//ad").map
+        trovitProperties = get_properties_from_trovit(trovitXmlFile)
 
         Item.destroy_all
 
-        adNodes.each { |node| 
+        trovitProperties.each { |node| 
         itemCreated = Item.create(
             item_id:node.at_css("id").nil? ? "" : node.at_css("id").text, 
             property_type:node.at_css("property_type").nil? ? "" : node.at_css("property_type").text,
