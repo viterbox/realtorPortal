@@ -1,7 +1,26 @@
-<h1>List</h1>
-<p>Find me in app/views/items/list.html.erb</p>
-<%= paginate @items %>
+<h1>RealtorPortal</h1>
+<p>A fancy new real estate portal</p>
+
+<div style="float:right"> <h3><%= paginate @items %></h3> </div>
 
 <%  @items.each do |item| %>
-    <div><%= item.item_id %></div>
+<div style="margin:50px">
+    <%if item.picture.first().nil? %>
+        <div><img src=<%= asset_path( 'notAvailable.jpg' ) %> width="420" </img></div>
+    <%else%>
+        <div><img src=<%= item.picture.first().picture_url %> width="420" </img></div>
+    <%end%>
+    <div><h2> <%= item.property_type %> - <%= item.type %> - <%= item.currency %> <%= item.price %> </h2></div>
+    <div><h4>Ref: <%= item.item_id %></h4></div>
+    <div><%= item.title %></div>
+    <div>Detalle: <%= item.content %></div>
+    <div>Dirección: <%= item.location.region %> - <%= item.location.city %> - <%= item.location.city_area %>  </div>
+    <div><h4>Atributos</h4></div>
+    <%  item.attribute.each do |attr| %>
+        <div><%= attr.name %>: <%= attr.value %> <%= attr.decorated %></div>
+    <% end %>
+
+</div>
 <% end %>
+
+<div style="float:right"> <h3><%= paginate @items %></h3> </div>
