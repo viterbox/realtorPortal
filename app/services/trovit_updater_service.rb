@@ -29,20 +29,24 @@ class TrovitUpdaterService < UpdaterService
         trovitXmlFile.xpath("//ad").map
     end
 
+    def get_property_fied(trovitProperty, fildName)
+        trovitProperty.at_css(fildName).nil? ? "" : trovitProperty.at_css(fildName).text
+    end
+
     def build_item(trovitProperty)
         newItem = Item.create(
-            item_id:trovitProperty.at_css("id").nil? ? "" : trovitProperty.at_css("id").text, 
-            property_type:trovitProperty.at_css("property_type").nil? ? "" : trovitProperty.at_css("property_type").text,
-            url:trovitProperty.at_css("url").nil? ? "" : trovitProperty.at_css("url").text,
-            title:trovitProperty.at_css("title").nil? ? "" : trovitProperty.at_css("title").text,
-            content:trovitProperty.at_css("content").nil? ? "" : trovitProperty.at_css("content").text,
-            type:trovitProperty.at_css("type").nil? ? "" : trovitProperty.at_css("type").text,
-            agency:trovitProperty.at_css("agency").nil? ? "" : trovitProperty.at_css("agency").text,
+            item_id:get_property_fied(trovitProperty, "id"), 
+            property_type:get_property_fied(trovitProperty, "property_type"),
+            url:get_property_fied(trovitProperty, "url"),
+            title:get_property_fied(trovitProperty, "title"),
+            content:get_property_fied(trovitProperty, "content"),
+            type:get_property_fied(trovitProperty, "type"),
+            agency:get_property_fied(trovitProperty, "agency"),
             currency:trovitProperty.at_css("price").nil? ? "" : trovitProperty.at_css("price").attr("currency"),
-            price:trovitProperty.at_css("price").nil? ? "" : trovitProperty.at_css("price").text,
+            price:get_property_fied(trovitProperty, "price"),
             period:trovitProperty.at_css("price").nil? ? "" : trovitProperty.at_css("price").attr("period"),
-            date:trovitProperty.at_css("date").nil? ? "" : trovitProperty.at_css("date").text,
-            time:trovitProperty.at_css("time").nil? ? "" : trovitProperty.at_css("time").text
+            date:get_property_fied(trovitProperty, "date"),
+            time:get_property_fied(trovitProperty, "time"),
         )
     end
 
