@@ -110,19 +110,47 @@ class TrovitUpdaterService < UpdaterService
         item.picture.create(picturesList)     
     end
 
+    def update_item(currentItem, trovitProperty)
+         currentItem.update(
+            item_id:get_property_field(trovitProperty, "id"), 
+            property_type:get_property_field(trovitProperty, "property_type"),
+            url:get_property_field(trovitProperty, "url"),
+            title:get_property_field(trovitProperty, "title"),
+            content:get_property_field(trovitProperty, "content"),
+            type:get_property_field(trovitProperty, "type"),
+            agency:get_property_field(trovitProperty, "agency"),
+            currency:get_property_field_attribute(trovitProperty, "price", "currency"),
+            price:get_property_field(trovitProperty, "price"),
+            period:get_property_field_attribute(trovitProperty, "price", "period"),
+            date:get_property_field(trovitProperty, "date"),
+            time:get_property_field(trovitProperty, "time"),
+            status:"active",
+            last_updated:DateTime.now
+        )
+    end
+
     def update_data
         
         trovitXmlFile = open_trovit_file
 
         trovitProperties = get_properties_from_trovit(trovitXmlFile)
 
-        Item.destroy_all
+        #Item.destroy_all
 
         trovitProperties.each { |trovitProperty| 
-            newItem = build_item(trovitProperty)
-            build_item_location(newItem, trovitProperty)
-            build_item_attributes(newItem, trovitProperty)
-            build_item_pictures(newItem,trovitProperty)
+            
+            itemId = get_property_field(trovitProperty, "id")
+
+            item = Item.get_by_item_id(itemId)
+          
+            if !item.exists?
+                newItem = build_item(trovitProperty)
+                build_item_location(newItem, trovitProperty)
+                build_item_attributes(newItem, trovitProperty)
+                build_item_pictures(newItem,trovitProperty)
+            else
+                update_item(item,trovitProperty)
+            end
         }
     end
 end
