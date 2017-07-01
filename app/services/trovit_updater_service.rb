@@ -51,6 +51,7 @@ class TrovitUpdaterService < UpdaterService
             period:get_property_field_attribute(trovitProperty, "price", "period"),
             date:get_property_field(trovitProperty, "date"),
             time:get_property_field(trovitProperty, "time"),
+            status:"active"
         )
     end
 
@@ -65,8 +66,8 @@ class TrovitUpdaterService < UpdaterService
         )
     end
 
-    def build_item_attributes(item, trovitProperty)
-        attributeList = []
+    def get_attributes_list(trovitProperty)
+         attributeList = []
 
         if (get_property_field(trovitProperty, "rooms") != "")
             attributeList << {type:"integer", name:"rooms", value:get_property_field(trovitProperty, "rooms"), decorated:""}
@@ -96,17 +97,85 @@ class TrovitUpdaterService < UpdaterService
             attributeList << {type:"number_unit", name:"plot_area", value:get_property_field(trovitProperty, "plot_area"), decorated:get_property_field_attribute(trovitProperty, "plot_area", "unit")}
         end
 
-        item.attribute.create(attributeList)     
+        attributeList
     end
 
-    def build_item_pictures(item, trovitProperty)
-        pictures = trovitProperty.at_css("pictures").nil? ? [] : trovitProperty.at_css("pictures").xpath("picture").map
+    def build_item_attributes(item, trovitProperty)
+       attributeList = get_attributes_list(trovitProperty)
+       item.attribute.create(attributeList)     
+    end
+
+    def get_picture_list(trovitProperty)
         picturesList = []
+        pictures = trovitProperty.at_css("pictures").nil? ? [] : trovitProperty.at_css("pictures").xpath("picture").map
         pictures.each{ |picture|
             picturesList << {picture_url:picture.at_css("picture_url").text}
         }
 
+        picturesList
+    end
+
+    def build_item_pictures(item, trovitProperty)
+        picturesList = get_picture_list(trovitProperty)
         item.picture.create(picturesList)     
+    end
+
+    def update_item(currentItem, trovitProperty)
+
+         currentItem.update(
+            item_id:get_property_field(trovitProperty, "id"), 
+            property_type:get_property_field(trovitProperty, "property_type"),
+            url:get_property_field(trovitProperty, "url"),
+            title:get_property_field(trovitProperty, "title"),
+            content:get_property_field(trovitProperty, "content"),
+            type:get_property_field(trovitProperty, "type"),
+            agency:get_property_field(trovitProperty, "agency"),
+            currency:get_property_field_attribute(trovitProperty, "price", "currency"),
+            price:get_property_field(trovitProperty, "price"),
+            period:get_property_field_attribute(trovitProperty, "price", "period"),
+            date:get_property_field(trovitProperty, "date"),
+            time:get_property_field(trovitProperty, "time"),
+            status:"active",
+            last_updated:DateTime.now
+        )
+    end
+
+    def update_item_location(currentItem, trovitProperty)
+
+        currentItem.update( 
+            'location.city':get_property_field(trovitProperty, "city"),
+            'location.city_area':get_property_field(trovitProperty, "city_area"),
+            'location.region':get_property_field(trovitProperty, "region"),
+            'location.postalcode':get_property_field(trovitProperty, "postalcode"),
+            'location.longitude':get_property_field(trovitProperty, "longitude"),
+            'location.latitude':get_property_field(trovitProperty, "latitude")    
+        )
+        
+    end
+
+    def update_item_attributes(currentItem, trovitProperty)
+        attributeList = get_attributes_list(trovitProperty)
+        currentItem.update(attribute:attributeList)      
+    end
+
+     def update_item_pictures(currentItem, trovitProperty)
+        picturesList = get_picture_list(trovitProperty)
+        currentItem.update(picture:picturesList)     
+    end
+
+    def turn_off_items(trovitXmlFile)
+        itemIdsFromXml = trovitXmlFile.xpath("//id").map
+         
+        itemIdsXmlList = []
+        itemIdsFromXml.each{ |itemIdXml|
+             itemIdsXmlList << itemIdXml.text   
+        }
+
+        Item.all.each{|item|   
+            if !itemIdsXmlList.include? item.item_id
+                item.update(status:"closed")
+            end
+        }
     end
 
     def update_data
@@ -115,13 +184,27 @@ class TrovitUpdaterService < UpdaterService
 
         trovitProperties = get_properties_from_trovit(trovitXmlFile)
 
-        Item.destroy_all
+        #Item.destroy_all
 
         trovitProperties.each { |trovitProperty| 
-            newItem = build_item(trovitProperty)
-            build_item_location(newItem, trovitProperty)
-            build_item_attributes(newItem, trovitProperty)
-            build_item_pictures(newItem,trovitProperty)
+            
+            itemId = get_property_field(trovitProperty, "id")
+
+            item = Item.get_by_item_id(itemId)
+          
+            if !item.exists?
+                newItem = build_item(trovitProperty)
+                build_item_location(newItem, trovitProperty)
+                build_item_attributes(newItem, trovitProperty)
+                build_item_pictures(newItem,trovitProperty)
+            else
+                update_item(item,trovitProperty)
+                update_item_location(item, trovitProperty)
+                update_item_attributes(item, trovitProperty)
+                update_item_pictures(item, trovitProperty)
+            end
         }
+
+        turn_off_items(trovitXmlFile)
     end
 end
