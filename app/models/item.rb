@@ -16,6 +16,8 @@ class Item
   field :date, type: String
   field :time, type: String
   field :status, type: String
+  field :date_created, type: DateTime, default: DateTime.now
+  field :last_updated, type: DateTime, default: DateTime.now
 
   def self.get_by_item_id(itemId)
     Item.where(item_id:itemId)  
