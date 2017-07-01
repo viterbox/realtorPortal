@@ -110,10 +110,10 @@ class TrovitUpdaterService < UpdaterService
         Item.destroy_all
 
         trovitProperties.each { |trovitProperty| 
-        itemCreated = build_item(trovitProperty)
-        build_item_location(itemCreated, trovitProperty)
-        build_item_attributes(itemCreated, trovitProperty)
-        build_item_pictures(itemCreated,trovitProperty)
+            itemCreated = build_item(trovitProperty)
+            build_item_location(itemCreated, trovitProperty)
+            build_item_attributes(itemCreated, trovitProperty)
+            build_item_pictures(itemCreated,trovitProperty)
         }
     end
 end
