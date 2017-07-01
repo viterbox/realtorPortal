@@ -51,6 +51,7 @@ class TrovitUpdaterService < UpdaterService
             period:get_property_field_attribute(trovitProperty, "price", "period"),
             date:get_property_field(trovitProperty, "date"),
             time:get_property_field(trovitProperty, "time"),
+            status:"active"
         )
     end
 
