@@ -29,63 +29,71 @@ class TrovitUpdaterService < UpdaterService
         trovitXmlFile.xpath("//ad").map
     end
 
+    def get_property_field(trovitProperty, fildName)
+        trovitProperty.at_css(fildName).nil? ? "" : trovitProperty.at_css(fildName).text
+    end
+
+    def get_property_field_attribute(trovitProperty, fildName, attributeName)
+        trovitProperty.at_css(fildName).nil? ? "" : (trovitProperty.at_css(fildName).attr(attributeName).nil? ? "" : trovitProperty.at_css(fildName).attr(attributeName))
+    end
+
     def build_item(trovitProperty)
         newItem = Item.create(
-            item_id:trovitProperty.at_css("id").nil? ? "" : trovitProperty.at_css("id").text, 
-            property_type:trovitProperty.at_css("property_type").nil? ? "" : trovitProperty.at_css("property_type").text,
-            url:trovitProperty.at_css("url").nil? ? "" : trovitProperty.at_css("url").text,
-            title:trovitProperty.at_css("title").nil? ? "" : trovitProperty.at_css("title").text,
-            content:trovitProperty.at_css("content").nil? ? "" : trovitProperty.at_css("content").text,
-            type:trovitProperty.at_css("type").nil? ? "" : trovitProperty.at_css("type").text,
-            agency:trovitProperty.at_css("agency").nil? ? "" : trovitProperty.at_css("agency").text,
-            currency:trovitProperty.at_css("price").nil? ? "" : trovitProperty.at_css("price").attr("currency"),
-            price:trovitProperty.at_css("price").nil? ? "" : trovitProperty.at_css("price").text,
-            period:trovitProperty.at_css("price").nil? ? "" : trovitProperty.at_css("price").attr("period"),
-            date:trovitProperty.at_css("date").nil? ? "" : trovitProperty.at_css("date").text,
-            time:trovitProperty.at_css("time").nil? ? "" : trovitProperty.at_css("time").text
+            item_id:get_property_field(trovitProperty, "id"), 
+            property_type:get_property_field(trovitProperty, "property_type"),
+            url:get_property_field(trovitProperty, "url"),
+            title:get_property_field(trovitProperty, "title"),
+            content:get_property_field(trovitProperty, "content"),
+            type:get_property_field(trovitProperty, "type"),
+            agency:get_property_field(trovitProperty, "agency"),
+            currency:get_property_field_attribute(trovitProperty, "price", "currency"),
+            price:get_property_field(trovitProperty, "price"),
+            period:get_property_field_attribute(trovitProperty, "price", "period"),
+            date:get_property_field(trovitProperty, "date"),
+            time:get_property_field(trovitProperty, "time"),
         )
     end
 
     def build_item_location(item, trovitProperty)
         item.create_location(
-            city:trovitProperty.at_css("city").nil? ? "" : trovitProperty.at_css("city").text,
-            city_area:trovitProperty.at_css("city_area").nil? ? "" : trovitProperty.at_css("city_area").text,
-            region:trovitProperty.at_css("region").nil? ? "" : trovitProperty.at_css("region").text,
-            postalcode:trovitProperty.at_css("postalcode").nil? ? "" : trovitProperty.at_css("postalcode").text,
-            longitude:trovitProperty.at_css("longitude").nil? ? "" : trovitProperty.at_css("longitude").text,
-            latitude:trovitProperty.at_css("latitude").nil? ? "" : trovitProperty.at_css("latitude").text
+            city:get_property_field(trovitProperty, "city"),
+            city_area:get_property_field(trovitProperty, "city_area"),
+            region:get_property_field(trovitProperty, "region"),
+            postalcode:get_property_field(trovitProperty, "postalcode"),
+            longitude:get_property_field(trovitProperty, "longitude"),
+            latitude:get_property_field(trovitProperty, "latitude"),
         )
     end
 
     def build_item_attributes(item, trovitProperty)
         attributeList = []
 
-        if (!trovitProperty.at_css("rooms").nil?)
-            attributeList << {type:"integer",name:"rooms",value:trovitProperty.at_css("rooms").text,decorated:""}
+        if (get_property_field(trovitProperty, "rooms") != "")
+            attributeList << {type:"integer", name:"rooms", value:get_property_field(trovitProperty, "rooms"), decorated:""}
         end
 
-        if (!trovitProperty.at_css("bathrooms").nil?)
-            attributeList << {type:"integer",name:"bathrooms",value:trovitProperty.at_css("bathrooms").text,decorated:""}
+        if (get_property_field(trovitProperty, "bathrooms") != "")
+            attributeList << {type:"integer", name:"bathrooms", value:trovitProperty.at_css("bathrooms").text, decorated:""}
         end
 
-        if (!trovitProperty.at_css("parking").nil?)
-            attributeList << {type:"integer",name:"parking",value:trovitProperty.at_css("parking").text,decorated:""}
+        if (get_property_field(trovitProperty, "parking") != "")
+            attributeList << {type:"integer", name:"parking", value:get_property_field(trovitProperty, "parking"), decorated:""}
         end
 
-        if (!trovitProperty.at_css("year").nil?)
-            attributeList << {type:"integer",name:"year",value:trovitProperty.at_css("year").text,decorated:""}
+        if (get_property_field(trovitProperty, "year") != "")
+            attributeList << {type:"integer", name:"year", value:get_property_field(trovitProperty, "year"), decorated:""}
         end
 
-        if (!trovitProperty.at_css("is_new").nil?)
-            attributeList << {type:"boolean",name:"is_new",value:trovitProperty.at_css("is_new").text,decorated:""}
+        if (get_property_field(trovitProperty, "is_new") != "")
+            attributeList << {type:"boolean", name:"is_new", value:get_property_field(trovitProperty, "is_new"), decorated:""}
         end
 
-        if (!trovitProperty.at_css("floor_area").nil?)
-            attributeList << {type:"number_unit",name:"floor_area",value:trovitProperty.at_css("floor_area").text,decorated:trovitProperty.at_css("floor_area").attr("unit")}
+        if (get_property_field(trovitProperty, "floor_area") != "")
+            attributeList << {type:"number_unit", name:"floor_area", value:get_property_field(trovitProperty, "floor_area"), decorated:get_property_field_attribute(trovitProperty, "floor_area", "unit")}
         end
 
-        if (!trovitProperty.at_css("plot_area").nil?)
-            attributeList << {type:"number_unit",name:"plot_area",value:trovitProperty.at_css("plot_area").text,decorated:trovitProperty.at_css("plot_area").attr("unit")}
+        if (get_property_field(trovitProperty, "plot_area") != "")
+            attributeList << {type:"number_unit", name:"plot_area", value:get_property_field(trovitProperty, "plot_area"), decorated:get_property_field_attribute(trovitProperty, "plot_area", "unit")}
         end
 
         item.attribute.create(attributeList)     
