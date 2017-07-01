@@ -129,6 +129,18 @@ class TrovitUpdaterService < UpdaterService
         )
     end
 
+    def update_item_location(currentItem, trovitProperty)
+        currentItem.update( 
+            'location.city':get_property_field(trovitProperty, "city"),
+            'location.city_area':get_property_field(trovitProperty, "city_area"),
+            'location.region':get_property_field(trovitProperty, "region"),
+            'location.postalcode':get_property_field(trovitProperty, "postalcode"),
+            'location.longitude':get_property_field(trovitProperty, "longitude"),
+            'location.latitude':get_property_field(trovitProperty, "latitude")    
+        )
+        
+    end
+
     def update_data
         
         trovitXmlFile = open_trovit_file
@@ -150,6 +162,7 @@ class TrovitUpdaterService < UpdaterService
                 build_item_pictures(newItem,trovitProperty)
             else
                 update_item(item,trovitProperty)
+                update_item_location(item, trovitProperty)
             end
         }
     end
