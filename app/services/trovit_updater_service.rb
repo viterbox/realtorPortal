@@ -30,7 +30,7 @@ class TrovitUpdaterService < UpdaterService
     end
 
     def build_item(trovitProperty)
-        itemCreated = Item.create(
+        newItem = Item.create(
             item_id:trovitProperty.at_css("id").nil? ? "" : trovitProperty.at_css("id").text, 
             property_type:trovitProperty.at_css("property_type").nil? ? "" : trovitProperty.at_css("property_type").text,
             url:trovitProperty.at_css("url").nil? ? "" : trovitProperty.at_css("url").text,
@@ -110,10 +110,10 @@ class TrovitUpdaterService < UpdaterService
         Item.destroy_all
 
         trovitProperties.each { |trovitProperty| 
-            itemCreated = build_item(trovitProperty)
-            build_item_location(itemCreated, trovitProperty)
-            build_item_attributes(itemCreated, trovitProperty)
-            build_item_pictures(itemCreated,trovitProperty)
+            newItem = build_item(trovitProperty)
+            build_item_location(newItem, trovitProperty)
+            build_item_attributes(newItem, trovitProperty)
+            build_item_pictures(newItem,trovitProperty)
         }
     end
 end
