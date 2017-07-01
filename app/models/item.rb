@@ -16,4 +16,8 @@ class Item
   field :date, type: String
   field :time, type: String
   field :status, type: String
+
+  def self.get_by_item_id(itemId)
+    Item.where(item_id:itemId)  
+  end
 end
