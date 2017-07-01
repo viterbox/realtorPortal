@@ -15,4 +15,5 @@ class Item
   field :period, type: String
   field :date, type: String
   field :time, type: String
+  field :status, type: String
 end
