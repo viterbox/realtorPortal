@@ -105,13 +105,18 @@ class TrovitUpdaterService < UpdaterService
        item.attribute.create(attributeList)     
     end
 
-    def build_item_pictures(item, trovitProperty)
-        pictures = trovitProperty.at_css("pictures").nil? ? [] : trovitProperty.at_css("pictures").xpath("picture").map
+    def get_picture_list(trovitProperty)
         picturesList = []
+        pictures = trovitProperty.at_css("pictures").nil? ? [] : trovitProperty.at_css("pictures").xpath("picture").map
         pictures.each{ |picture|
             picturesList << {picture_url:picture.at_css("picture_url").text}
         }
 
+        picturesList
+    end
+
+    def build_item_pictures(item, trovitProperty)
+        picturesList = get_picture_list(trovitProperty)
         item.picture.create(picturesList)     
     end
 
@@ -159,7 +164,7 @@ class TrovitUpdaterService < UpdaterService
 
         trovitProperties = get_properties_from_trovit(trovitXmlFile)
 
-        #Item.destroy_all
+        Item.destroy_all
 
         trovitProperties.each { |trovitProperty| 
             
