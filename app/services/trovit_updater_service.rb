@@ -46,6 +46,17 @@ class TrovitUpdaterService < UpdaterService
         )
     end
 
+    def build_item_location(item, trovitPropery)
+        item.create_location(
+            city:trovitPropery.at_css("city").nil? ? "" : trovitPropery.at_css("city").text,
+            city_area:trovitPropery.at_css("city_area").nil? ? "" : trovitPropery.at_css("city_area").text,
+            region:trovitPropery.at_css("region").nil? ? "" : trovitPropery.at_css("region").text,
+            postalcode:trovitPropery.at_css("postalcode").nil? ? "" : trovitPropery.at_css("postalcode").text,
+            longitude:trovitPropery.at_css("longitude").nil? ? "" : trovitPropery.at_css("longitude").text,
+            latitude:trovitPropery.at_css("latitude").nil? ? "" : trovitPropery.at_css("latitude").text
+        )
+    end
+
     def update_data
         
         trovitXmlFile = open_trovit_file
@@ -56,16 +67,7 @@ class TrovitUpdaterService < UpdaterService
 
         trovitProperties.each { |trovitPropery| 
         itemCreated = build_item(trovitPropery)
-
-        # Location management
-        itemCreated.create_location(
-            city:trovitPropery.at_css("city").nil? ? "" : trovitPropery.at_css("city").text,
-            city_area:trovitPropery.at_css("city_area").nil? ? "" : trovitPropery.at_css("city_area").text,
-            region:trovitPropery.at_css("region").nil? ? "" : trovitPropery.at_css("region").text,
-            postalcode:trovitPropery.at_css("postalcode").nil? ? "" : trovitPropery.at_css("postalcode").text,
-            longitude:trovitPropery.at_css("longitude").nil? ? "" : trovitPropery.at_css("longitude").text,
-            latitude:trovitPropery.at_css("latitude").nil? ? "" : trovitPropery.at_css("latitude").text
-        )
+        build_item_location(itemCreated, trovitPropery)
 
         # Attributes management
         attributeList = []
