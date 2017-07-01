@@ -29,7 +29,7 @@ class TrovitUpdaterService < UpdaterService
         trovitXmlFile.xpath("//ad").map
     end
 
-    def build_item_by_trovit_property(trovitPropery)
+    def build_item(trovitPropery)
         itemCreated = Item.create(
             item_id:trovitPropery.at_css("id").nil? ? "" : trovitPropery.at_css("id").text, 
             property_type:trovitPropery.at_css("property_type").nil? ? "" : trovitPropery.at_css("property_type").text,
@@ -55,7 +55,7 @@ class TrovitUpdaterService < UpdaterService
         Item.destroy_all
 
         trovitProperties.each { |trovitPropery| 
-        itemCreated = build_item_by_trovit_property(trovitPropery)
+        itemCreated = build_item(trovitPropery)
 
         # Location management
         itemCreated.create_location(
