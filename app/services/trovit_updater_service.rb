@@ -158,13 +158,18 @@ class TrovitUpdaterService < UpdaterService
         currentItem.update(attribute:attributeList)      
     end
 
+     def update_item_pictures(currentItem, trovitProperty)
+        picturesList = get_picture_list(trovitProperty)
+        currentItem.update(picture:picturesList)     
+    end
+
     def update_data
         
         trovitXmlFile = open_trovit_file
 
         trovitProperties = get_properties_from_trovit(trovitXmlFile)
 
-        Item.destroy_all
+        #Item.destroy_all
 
         trovitProperties.each { |trovitProperty| 
             
@@ -181,6 +186,7 @@ class TrovitUpdaterService < UpdaterService
                 update_item(item,trovitProperty)
                 update_item_location(item, trovitProperty)
                 update_item_attributes(item, trovitProperty)
+                update_item_pictures(item, trovitProperty)
             end
         }
     end
