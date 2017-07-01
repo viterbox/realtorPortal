@@ -15,7 +15,7 @@ class ItemsController < ApplicationController
       vPage= :page
     end
 
-    @items = Kaminari.paginate_array(Item.all).page(params[vPage])
+    @items = Kaminari.paginate_array(Item.where(status:"active")).page(params[vPage])
 
   end
 
