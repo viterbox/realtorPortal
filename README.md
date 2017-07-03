@@ -10,6 +10,10 @@ Ruby version: 2.4.1
 
 Mongo 3.*
 
+## Run test
+
+bundle exec rspec
+
 ## Instructions
 
 1. Run rails server
@@ -21,4 +25,6 @@ Mongo 3.*
 3. Visit realtorPortal, opening in browser:
 
     http://localhost:3000/items/list
+
+
 
