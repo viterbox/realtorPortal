@@ -9,9 +9,7 @@ class UpdaterController < ApplicationController
       updaterType = params[:type]
     end
 
-    updaterFactoryService = UpdaterFactoryService.new
-
-    updaterService = updaterFactoryService.get_updater_service(updaterType)
+    updaterService = UpdaterFactoryService.get_updater_service(updaterType)
     updaterService.get_datasource
     updaterService.update_data
     
