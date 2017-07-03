@@ -1,5 +1,6 @@
 require_relative 'updater_service'
 require_relative 'file_utils_service'
+require_relative '../dtos/property_dto'
 
 class TrovitUpdaterService < UpdaterService
 
@@ -7,203 +8,109 @@ class TrovitUpdaterService < UpdaterService
     TROVIT_GZ_FILE_PATH = '/tmp/trovit_MX.xml.gz'
     TROVIT_XML_FILE_PATH = '/tmp/trovit_MX.xml'
 
-    def get_datasource
-         download_trovit_file
-         uncompress_trovit_file
-    end
+    trovitXmlFile = nil
 
-    def download_trovit_file
+    def get_properties
+        propertyList = []
+
         FileUtilsService.download_file(TROVIT_GZ_FILE_URL, TROVIT_GZ_FILE_PATH)
-    end
-
-    def uncompress_trovit_file
         FileUtilsService.uncompress_gz_file(TROVIT_GZ_FILE_PATH, TROVIT_XML_FILE_PATH)
+        trovitXmlFile = FileUtilsService.open_xml_file(TROVIT_XML_FILE_PATH)
+
+        trovitAdNodes = get_properties_from_trovit(trovitXmlFile)
+    
+        build_property_list(trovitAdNodes)
     end
 
-    def open_trovit_file
-        FileUtilsService.open_xml_file(TROVIT_XML_FILE_PATH)
+    def build_property_list(trovitAdNodes)
+        propertyList = []
+
+        trovitAdNodes.each { |adNode|
+            
+            property = PropertyDto.new
+            
+            property.item_id = get_property_field(adNode, "id")
+            property.property_type = get_property_field(adNode, "property_type")
+            property.url = get_property_field(adNode, "url")
+            property.title = get_property_field(adNode, "title")
+            property.content = get_property_field(adNode, "content")
+            property.type = get_property_field(adNode, "type")
+            property.agency = get_property_field(adNode, "agency")
+            property.currency = get_property_field_attribute(adNode, "price", "currency")
+            property.price = get_property_field(adNode, "price")
+            property.period = get_property_field_attribute(adNode, "price", "period")
+            property.date = get_property_field(adNode, "date")
+            property.time = get_property_field(adNode, "time")
+
+            property.city = get_property_field(adNode, "city")
+            property.city_area = get_property_field(adNode, "city_area")
+            property.region = get_property_field(adNode, "region")
+            property.postalcode = get_property_field(adNode, "postalcode")
+            property.longitude = get_property_field(adNode, "longitude")
+            property.latitude = get_property_field(adNode, "latitude")
+
+            property.attributes = get_attributes_list(adNode)
+            property.pictures = get_picture_list(adNode)
+            
+            propertyList << property
+        }
+
+        propertyList
     end
 
     def get_properties_from_trovit(trovitXmlFile)
         trovitXmlFile.xpath("//ad").map
     end
 
-    def get_property_field(trovitProperty, fildName)
-        trovitProperty.at_css(fildName).nil? ? "" : trovitProperty.at_css(fildName).text
+    def get_property_field(adNode, fildName)
+        adNode.at_css(fildName).nil? ? "" : adNode.at_css(fildName).text
     end
 
-    def get_property_field_attribute(trovitProperty, fildName, attributeName)
-        trovitProperty.at_css(fildName).nil? ? "" : (trovitProperty.at_css(fildName).attr(attributeName).nil? ? "" : trovitProperty.at_css(fildName).attr(attributeName))
+    def get_property_field_attribute(adNode, fildName, attributeName)
+        adNode.at_css(fildName).nil? ? "" : (adNode.at_css(fildName).attr(attributeName).nil? ? "" : adNode.at_css(fildName).attr(attributeName))
     end
 
-    def build_item(trovitProperty)
-        newItem = Item.create(
-            item_id:get_property_field(trovitProperty, "id"), 
-            property_type:get_property_field(trovitProperty, "property_type"),
-            url:get_property_field(trovitProperty, "url"),
-            title:get_property_field(trovitProperty, "title"),
-            content:get_property_field(trovitProperty, "content"),
-            type:get_property_field(trovitProperty, "type"),
-            agency:get_property_field(trovitProperty, "agency"),
-            currency:get_property_field_attribute(trovitProperty, "price", "currency"),
-            price:get_property_field(trovitProperty, "price"),
-            period:get_property_field_attribute(trovitProperty, "price", "period"),
-            date:get_property_field(trovitProperty, "date"),
-            time:get_property_field(trovitProperty, "time"),
-            status:"active"
-        )
-    end
-
-    def build_item_location(item, trovitProperty)
-        item.create_location(
-            city:get_property_field(trovitProperty, "city"),
-            city_area:get_property_field(trovitProperty, "city_area"),
-            region:get_property_field(trovitProperty, "region"),
-            postalcode:get_property_field(trovitProperty, "postalcode"),
-            longitude:get_property_field(trovitProperty, "longitude"),
-            latitude:get_property_field(trovitProperty, "latitude"),
-        )
-    end
-
-    def get_attributes_list(trovitProperty)
+    def get_attributes_list(adNode)
          attributeList = []
 
-        if (get_property_field(trovitProperty, "rooms") != "")
-            attributeList << {type:"integer", name:"rooms", value:get_property_field(trovitProperty, "rooms"), decorated:""}
+        if (get_property_field(adNode, "rooms") != "")
+            attributeList << {type:"integer", name:"rooms", value:get_property_field(adNode, "rooms"), decorated:""}
         end
 
-        if (get_property_field(trovitProperty, "bathrooms") != "")
-            attributeList << {type:"integer", name:"bathrooms", value:trovitProperty.at_css("bathrooms").text, decorated:""}
+        if (get_property_field(adNode, "bathrooms") != "")
+            attributeList << {type:"integer", name:"bathrooms", value:adNode.at_css("bathrooms").text, decorated:""}
         end
 
-        if (get_property_field(trovitProperty, "parking") != "")
-            attributeList << {type:"integer", name:"parking", value:get_property_field(trovitProperty, "parking"), decorated:""}
+        if (get_property_field(adNode, "parking") != "")
+            attributeList << {type:"integer", name:"parking", value:get_property_field(adNode, "parking"), decorated:""}
         end
 
-        if (get_property_field(trovitProperty, "year") != "")
-            attributeList << {type:"integer", name:"year", value:get_property_field(trovitProperty, "year"), decorated:""}
+        if (get_property_field(adNode, "year") != "")
+            attributeList << {type:"integer", name:"year", value:get_property_field(adNode, "year"), decorated:""}
         end
 
-        if (get_property_field(trovitProperty, "is_new") != "")
-            attributeList << {type:"boolean", name:"is_new", value:get_property_field(trovitProperty, "is_new"), decorated:""}
+        if (get_property_field(adNode, "is_new") != "")
+            attributeList << {type:"boolean", name:"is_new", value:get_property_field(adNode, "is_new"), decorated:""}
         end
 
-        if (get_property_field(trovitProperty, "floor_area") != "")
-            attributeList << {type:"number_unit", name:"floor_area", value:get_property_field(trovitProperty, "floor_area"), decorated:get_property_field_attribute(trovitProperty, "floor_area", "unit")}
+        if (get_property_field(adNode, "floor_area") != "")
+            attributeList << {type:"number_unit", name:"floor_area", value:get_property_field(adNode, "floor_area"), decorated:get_property_field_attribute(adNode, "floor_area", "unit")}
         end
 
-        if (get_property_field(trovitProperty, "plot_area") != "")
-            attributeList << {type:"number_unit", name:"plot_area", value:get_property_field(trovitProperty, "plot_area"), decorated:get_property_field_attribute(trovitProperty, "plot_area", "unit")}
+        if (get_property_field(adNode, "plot_area") != "")
+            attributeList << {type:"number_unit", name:"plot_area", value:get_property_field(adNode, "plot_area"), decorated:get_property_field_attribute(adNode, "plot_area", "unit")}
         end
 
         attributeList
     end
 
-    def build_item_attributes(item, trovitProperty)
-       attributeList = get_attributes_list(trovitProperty)
-       item.attribute.create(attributeList)     
-    end
-
-    def get_picture_list(trovitProperty)
+    def get_picture_list(adNode)
         picturesList = []
-        pictures = trovitProperty.at_css("pictures").nil? ? [] : trovitProperty.at_css("pictures").xpath("picture").map
+        pictures = adNode.at_css("pictures").nil? ? [] : adNode.at_css("pictures").xpath("picture").map
         pictures.each{ |picture|
             picturesList << {picture_url:picture.at_css("picture_url").text}
         }
 
         picturesList
-    end
-
-    def build_item_pictures(item, trovitProperty)
-        picturesList = get_picture_list(trovitProperty)
-        item.picture.create(picturesList)     
-    end
-
-    def update_item(currentItem, trovitProperty)
-
-         currentItem.update(
-            item_id:get_property_field(trovitProperty, "id"), 
-            property_type:get_property_field(trovitProperty, "property_type"),
-            url:get_property_field(trovitProperty, "url"),
-            title:get_property_field(trovitProperty, "title"),
-            content:get_property_field(trovitProperty, "content"),
-            type:get_property_field(trovitProperty, "type"),
-            agency:get_property_field(trovitProperty, "agency"),
-            currency:get_property_field_attribute(trovitProperty, "price", "currency"),
-            price:get_property_field(trovitProperty, "price"),
-            period:get_property_field_attribute(trovitProperty, "price", "period"),
-            date:get_property_field(trovitProperty, "date"),
-            time:get_property_field(trovitProperty, "time"),
-            status:"active",
-            last_updated:DateTime.now
-        )
-    end
-
-    def update_item_location(currentItem, trovitProperty)
-
-        currentItem.update( 
-            'location.city':get_property_field(trovitProperty, "city"),
-            'location.city_area':get_property_field(trovitProperty, "city_area"),
-            'location.region':get_property_field(trovitProperty, "region"),
-            'location.postalcode':get_property_field(trovitProperty, "postalcode"),
-            'location.longitude':get_property_field(trovitProperty, "longitude"),
-            'location.latitude':get_property_field(trovitProperty, "latitude")    
-        )
-        
-    end
-
-    def update_item_attributes(currentItem, trovitProperty)
-        attributeList = get_attributes_list(trovitProperty)
-        currentItem.update(attribute:attributeList)      
-    end
-
-     def update_item_pictures(currentItem, trovitProperty)
-        picturesList = get_picture_list(trovitProperty)
-        currentItem.update(picture:picturesList)     
-    end
-
-    def turn_off_items(trovitXmlFile)
-        itemIdsFromXml = trovitXmlFile.xpath("//id").map
-         
-        itemIdsXmlList = []
-        itemIdsFromXml.each{ |itemIdXml|
-             itemIdsXmlList << itemIdXml.text   
-        }
-
-        Item.all.each{|item|   
-            if !itemIdsXmlList.include? item.item_id
-                item.update(status:"closed")
-            end
-        }
-    end
-
-    def update_data
-        
-        trovitXmlFile = open_trovit_file
-
-        trovitProperties = get_properties_from_trovit(trovitXmlFile)
-
-        #Item.destroy_all
-
-        trovitProperties.each { |trovitProperty| 
-            
-            itemId = get_property_field(trovitProperty, "id")
-
-            item = Item.get_by_item_id(itemId)
-          
-            if !item.exists?
-                newItem = build_item(trovitProperty)
-                build_item_location(newItem, trovitProperty)
-                build_item_attributes(newItem, trovitProperty)
-                build_item_pictures(newItem,trovitProperty)
-            else
-                update_item(item,trovitProperty)
-                update_item_location(item, trovitProperty)
-                update_item_attributes(item, trovitProperty)
-                update_item_pictures(item, trovitProperty)
-            end
-        }
-
-        turn_off_items(trovitXmlFile)
     end
 end
