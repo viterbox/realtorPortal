@@ -2,7 +2,21 @@ require 'test_helper'
 
 class ItemsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @item = items(:one)
+    @item = Item.create(
+            item_id:"Abc123", 
+            property_type:"Casa",
+            url:"https://www.stagingeb.com/mx/inmueble/1483-casa-en-cuauhtemoc-hipodromo-condesa?utm_source=Trovit",
+            title:"Casa en renta",
+            content:"Bella casa en renta",
+            type:"For sale",
+            agency:"Century21",
+            currency:"USD",
+            price:"8000",
+            period:"",
+            date:"02/27/2017",
+            time:"00:00",
+            status:"active"
+    )
   end
 
   test "should get index" do
@@ -17,7 +31,7 @@ class ItemsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create item" do
     assert_difference('Item.count') do
-      post items_url, params: { item: { agency: @item.agency, bathrooms: @item.bathrooms, city: @item.city, cityArea: @item.cityArea, content: @item.content, currency: @item.currency, date: @item.date, floorArea: @item.floorArea, itemId: @item.itemId, latitude: @item.latitude, longitude: @item.longitude, mainPicture: @item.mainPicture, price: @item.price, propertyType: @item.propertyType, region: @item.region, rooms: @item.rooms, time: @item.time, title: @item.title, type: @item.type, unit: @item.unit, url: @item.url } }
+      post items_url, params: { item: { agency: @item.agency, content: @item.content, date: @item.date, itemId: @item.item_id, price: @item.price, property_type: @item.property_type, time: @item.time, title: @item.title, type: @item.type, url: @item.url } }
     end
 
     assert_redirected_to item_url(Item.last)
@@ -34,7 +48,7 @@ class ItemsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update item" do
-    patch item_url(@item), params: { item: { agency: @item.agency, bathrooms: @item.bathrooms, city: @item.city, cityArea: @item.cityArea, content: @item.content, currency: @item.currency, date: @item.date, floorArea: @item.floorArea, itemId: @item.itemId, latitude: @item.latitude, longitude: @item.longitude, mainPicture: @item.mainPicture, price: @item.price, propertyType: @item.propertyType, region: @item.region, rooms: @item.rooms, time: @item.time, title: @item.title, type: @item.type, unit: @item.unit, url: @item.url } }
+    patch item_url(@item), params: { item: { agency: @item.agency, content: @item.content, date: @item.date, itemId: @item.item_id, price: @item.price, property_type: @item.property_type, time: @item.time, title: @item.title, type: @item.type, url: @item.url } }
     assert_redirected_to item_url(@item)
   end
 

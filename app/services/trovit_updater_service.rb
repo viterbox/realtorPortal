@@ -1,28 +1,27 @@
 require_relative 'updater_service'
-require 'zlib'
-require 'open-uri'
+require_relative 'file_utils_service'
 
 class TrovitUpdaterService < UpdaterService
+
+    TROVIT_GZ_FILE_URL = 'http://www.stagingeb.com/feeds/d420256874ddb9b6ee5502b9d54e773d8316a695/trovit_MX.xml.gz'
+    TROVIT_GZ_FILE_PATH = '/tmp/trovit_MX.xml.gz'
+    TROVIT_XML_FILE_PATH = '/tmp/trovit_MX.xml'
+
     def get_datasource
          download_trovit_file
          uncompress_trovit_file
     end
 
     def download_trovit_file
-        download = open('http://www.stagingeb.com/feeds/d420256874ddb9b6ee5502b9d54e773d8316a695/trovit_MX.xml.gz')
-        IO.copy_stream(download, '/tmp/trovit_MX.xml.gz')
+        FileUtilsService.download_file(TROVIT_GZ_FILE_URL, TROVIT_GZ_FILE_PATH)
     end
 
     def uncompress_trovit_file
-        Zlib::GzipReader.open('/tmp/trovit_MX.xml.gz') do | input_stream |
-            File.open("/tmp/trovit_MX.xml", "w") do |output_stream|
-                IO.copy_stream(input_stream, output_stream)
-            end
-        end
+        FileUtilsService.uncompress_gz_file(TROVIT_GZ_FILE_PATH, TROVIT_XML_FILE_PATH)
     end
 
     def open_trovit_file
-        File.open("/tmp/trovit_MX.xml") { |f| Nokogiri::XML(f) }
+        FileUtilsService.open_xml_file(TROVIT_XML_FILE_PATH)
     end
 
     def get_properties_from_trovit(trovitXmlFile)
