@@ -5,7 +5,7 @@ class UpdaterFactoryService
         case type
             when "TROVIT" then TrovitUpdaterService.new
         else
-             raise "Type not yet implemented"
+             raise "Updater Type #{type} not yet implemented"
         end  
     end
 end
