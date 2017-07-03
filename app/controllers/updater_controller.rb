@@ -9,10 +9,15 @@ class UpdaterController < ApplicationController
       updaterType = params[:type]
     end
 
-    updaterService = UpdaterFactoryService.get_updater_service(updaterType)
-    updaterService.get_datasource
-    updaterService.update_data
+    begin
+      updaterService = UpdaterFactoryService.get_updater_service(updaterType)
+      updaterService.execute
+       @result = "Data updated"
+    rescue Exception => e 
+       @result = "Error updating data - error: #{e.message}"
+    end
+   
+    @result
     
-    @result = "Data updated"
   end
 end
